@@ -1,18 +1,10 @@
 /*************************************************** 
-  This is an example for our Adafruit 16-channel PWM & Servo driver
-  Servo test - this will drive 8 servos, one after the other on the
-  first 8 pins of the PCA9685
-  Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/815
-  
-  These drivers use I2C to communicate, 2 pins are required to  
-  interface.
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
-  products from Adafruit!
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
-  BSD license, all text above must be included in any redistribution
+ *  This will drive 10 servos that each correspond to the 
+ *  digit of pi. It will turn the servo and then turn it back
+ *  in the order of pi
  ****************************************************/
+
+ //need to sleep the arduino until the bumper wakes it up. Disable uneeded timers and modules.
  //add front and back bump switches if back is 0 then run code
 
 #include <Wire.h>
@@ -36,7 +28,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 // our servo # counter
-uint8_t servonum[27] = {3,1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3};
+uint8_t servonum[2769] = {3,1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3};
 uint8_t Counter = 0;
 uint8_t FrontBumper, BackBumper;
 
@@ -88,7 +80,7 @@ void loop() {
 
     Counter++;
     if (Counter == 27)
-    while(1);
+      while(1);//spin loop
   //}
 }
 
