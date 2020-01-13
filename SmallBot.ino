@@ -13,6 +13,7 @@
   Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
  ****************************************************/
+ //add front and back bump switches if back is 0 then run code
 
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -37,6 +38,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 // our servo # counter
 uint8_t servonum[27] = {3,1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3};
 uint8_t Counter = 0;
+uint8_t FrontBumper, BackBumper;
 
 void setup() {
   Serial.begin(9600);
@@ -69,20 +71,24 @@ void setServoPulse(uint8_t n, double pulse) {
 }
 
 void loop() {
-  // Drive each servo one at a time using setPWM()
-  Serial.println(servonum[Counter]);
-  for (uint16_t pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
-    pwm.setPWM(servonum[Counter], 0, pulselen);
-  }
+  //if (BackBumper == 0)
+  //{
+    // Drive each servo one at a time using setPWM()
+    Serial.println(servonum[Counter]);
+    for (uint16_t pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
+      pwm.setPWM(servonum[Counter], 0, pulselen);
+    }
 
-  delay(500);
-  for (uint16_t pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen--) {
-    pwm.setPWM(servonum[Counter], 0, pulselen);
-  }
+    delay(500);
+    for (uint16_t pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen--) {
+      pwm.setPWM(servonum[Counter], 0, pulselen);
+    }
 
-  delay(500);
+    delay(500);
 
-  Counter++;
-  if (Counter == 27)
-	while(1);
+    Counter++;
+    if (Counter == 27)
+    while(1);
+  //}
 }
+
