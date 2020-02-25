@@ -23,10 +23,17 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 // Pin Declarations
 const int8_t BackL = 2; //Back Left Bumper Pin
 const int8_t BackR = 3; //Back Right bumper Pin
-const int8_t FrontL = 4; //Front Left Bumper Pin
+//const int8_t FrontL = 4; //Front Left Bumper Pin
 const int8_t FrontR = 5; //Front Right Bumper Pin
-const int8_t MotorL = 6; //Left Motor Pin 
-const int8_t MotorR = 7; //Right motor Pin
+const int8_t Motor2ENA = 6;
+const int8_t MotorR1 = 7; //Right Motor Pin
+const int8_t MotorR2 = 8; //Left Motor Pin
+const int8_t MotorL1 = 4;
+ 
+
+int motor2Speed;
+int8_t timercountprev;
+
 // Pin Declarations
 uint8_t servonum;     //Which servos is being pushed
 uint8_t Counter = 0;  //how many buttons should have been pushed
@@ -38,12 +45,14 @@ void temp(){}
 
 void setup() {
   Serial.begin(9600);
-  pinMode(FrontL, INPUT_PULLUP);
+  //pinMode(FrontL, INPUT_PULLUP);
   pinMode(FrontR, INPUT_PULLUP);
   pinMode(BackL, INPUT_PULLUP);
   pinMode(BackR, INPUT_PULLUP);
-  pinMode(MotorL, OUTPUT);
-  pinMode(MotorR, OUTPUT);
+  pinMode(MotorL1, OUTPUT);
+  pinMode(MotorR2, OUTPUT);
+  pinMode(MotorR1, OUTPUT);
+  pinMode(Motor2ENA, OUTPUT);
   
   pwm.begin();
   pwm.setOscillatorFrequency(27000000);  // The int.osc. is closer to 27MHz  
@@ -56,19 +65,7 @@ void setup() {
   
   //Read from SD Card
   servonum = myFile.read();
-  switch(servonum)
-  {
-    case 48: servonum = 0; break;
-    case 49: servonum = 1; break;
-    case 50: servonum = 2; break;
-    case 51: servonum = 3; break;
-    case 52: servonum = 4; break;
-    case 53: servonum = 5; break;
-    case 54: servonum = 6; break;
-    case 55: servonum = 7; break;
-    case 56: servonum = 8; break;
-    case 57: servonum = 9; break;
-  }
+  SDtoServo(servonum);
 
     cli(); //stop interrupts
   //set timer1 interrupt at 1Hz
@@ -104,24 +101,34 @@ void loop()
   BBumpRight = digitalRead(BackR);
   BBumpLeft = digitalRead(BackL);
   FBumpRight = digitalRead(FrontR);
-  FBumpLeft = digitalRead(FrontL);
+  FBumpLeft = digitalRead(FrontR);
+  
   if(BBumpRight == LOW || BBumpLeft == LOW)
     BackBumpFlg = 1; 
   
   if(FBumpRight == LOW || FBumpLeft == LOW){
     FrontBumpFlg = 1;
+    digitalWrite(MotorL1, LOW);
+    analogWrite(Motor2ENA, 100);
+    digitalWrite(MotorR1, HIGH);
+    digitalWrite(MotorR2, LOW);
+    delay(1000);
     // Delay for Latch mecanism delay(200);
   }
 
   if(BackBumpFlg == 1)
   {
-    //Turn Motor Controlls on  
+    //Turn Motor Controlls on 
+    digitalWrite(MotorL1, HIGH);
+    Serial.println("here");
   }
   
   if(FrontBumpFlg == 1)
   {
-    BackBumpFlg = 0;
+    digitalWrite(MotorR1, LOW);
+    digitalWrite(MotorL1, LOW);
     //Turn Motor Controlls off
+    BackBumpFlg = 0;
     
       if(startFlg == 0)
       {
@@ -140,32 +147,22 @@ void loop()
       for (uint16_t pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen+=5) {
         pwm.setPWM(servonum, 0, pulselen);
       }
+      
       //Pulling the servo Back
-      delay(500);
+      delay(250);
+      
       for (uint16_t pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen-=5) {
         pwm.setPWM(servonum, 0, pulselen);
       }
 
-      delay(500);
+      delay(250);
       
       //Counter for Debugging
       Counter++;
       //Read in next byte in file
       servonum = myFile.read();
       //Filter the value
-      switch(servonum)
-      {
-        case 48: servonum = 0; break;
-        case 49: servonum = 1; break;
-        case 50: servonum = 2; break;
-        case 51: servonum = 3; break;
-        case 52: servonum = 4; break;
-        case 53: servonum = 5; break;
-        case 54: servonum = 6; break;
-        case 55: servonum = 7; break;
-        case 56: servonum = 8; break;
-        case 57: servonum = 9; break;
-      }
+      SDtoServo(servonum);
   }
 }
 
@@ -181,3 +178,19 @@ ISR(TIMER1_COMPA_vect){//timer1 interrupt
   }
 }
 
+void SDtoServo(uint8_t SDnum)
+{
+        switch(SDnum)
+      {
+        case 48: servonum = 0; break;
+        case 49: servonum = 1; break;
+        case 50: servonum = 2; break;
+        case 51: servonum = 3; break;
+        case 52: servonum = 4; break;
+        case 53: servonum = 5; break;
+        case 54: servonum = 6; break;
+        case 55: servonum = 7; break;
+        case 56: servonum = 8; break;
+        case 57: servonum = 9; break;
+      }
+}
