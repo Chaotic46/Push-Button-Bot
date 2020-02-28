@@ -24,14 +24,18 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 const int8_t BackL = 2; //Back Left Bumper Pin
 const int8_t BackR = 3; //Back Right bumper Pin
 //const int8_t FrontL = 4; //Front Left Bumper Pin
-const int8_t FrontR = 5; //Front Right Bumper Pin
+const int8_t FrontR = 7; //Front Right Bumper Pin
+const int8_t FrontL = 8;
+const int8_t Motor1ENA = 5;
 const int8_t Motor2ENA = 6;
-const int8_t MotorR1 = 7; //Right Motor Pin
-const int8_t MotorR2 = 8; //Left Motor Pin
-const int8_t MotorL1 = 4;
+const int8_t MotorR1 = 17; //Right Motor Pin
+const int8_t MotorR2 = 16; //Left Motor Pin
+const int8_t MotorL1 = 15;
+const int8_t MotorL2 = 14;
  
 
 int motor2Speed;
+int motor1Speed;
 int8_t timercountprev;
 
 // Pin Declarations
@@ -45,7 +49,7 @@ void temp(){}
 
 void setup() {
   Serial.begin(9600);
-  //pinMode(FrontL, INPUT_PULLUP);
+  pinMode(FrontL, INPUT_PULLUP);
   pinMode(FrontR, INPUT_PULLUP);
   pinMode(BackL, INPUT_PULLUP);
   pinMode(BackR, INPUT_PULLUP);
@@ -53,6 +57,7 @@ void setup() {
   pinMode(MotorR2, OUTPUT);
   pinMode(MotorR1, OUTPUT);
   pinMode(Motor2ENA, OUTPUT);
+  pinMode(Motor1ENA, OUTPUT);
   
   pwm.begin();
   pwm.setOscillatorFrequency(27000000);  // The int.osc. is closer to 27MHz  
@@ -101,7 +106,7 @@ void loop()
   BBumpRight = digitalRead(BackR);
   BBumpLeft = digitalRead(BackL);
   FBumpRight = digitalRead(FrontR);
-  FBumpLeft = digitalRead(FrontR);
+  FBumpLeft = digitalRead(FrontL);
   
   if(BBumpRight == LOW || BBumpLeft == LOW)
     BackBumpFlg = 1; 
@@ -119,7 +124,9 @@ void loop()
   if(BackBumpFlg == 1)
   {
     //Turn Motor Controlls on 
+    analogWrite(Motor1ENA, 100);
     digitalWrite(MotorL1, HIGH);
+    digitalWrite(MotorL2, LOW);
     Serial.println("here");
   }
   
