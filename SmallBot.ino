@@ -16,8 +16,10 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 //SERVOMIN 50 is 45 degrees
 // Every 50 is 22.5 degrees for servo max when servo min is 50
 // Every 5 added to SERVOMAX adds 2.25 degrees
-#define SERVOMIN  200// This is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  360// This is the 'maximum' pulse length count (out of 4096)
+#define SERVOEVENMIN  300// This is the 'minimum' pulse length count (out of 4096) //even
+#define SERVOEVENMAX  360// This is the 'maximum' pulse length count (out of 4096) //even
+#define SERVOODDMIN   200
+#define SERVOODDMAX   250
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 // Pin Declarations
@@ -139,27 +141,41 @@ void loop()
     
       if(startFlg == 0)
       {
-        for (uint8_t i = 0; i < 15; i++)
+        /*for (uint8_t i = 0, j = 1; i < 15; i+=2, j+=2)
         {
-          for (uint16_t pulselen = 50; pulselen < 200; pulselen+=5)
+          for (uint16_t pulselen = 50, pulselen1 = 200; pulselen < 200; pulselen+=5, pulselen1-=5)
           {
-            pwm.setPWM(i, 0, pulselen);
+            pwm.setPWM(i, 0, pulselen1);
+            pwm.setPWM(j, 0, pulselen);
           }
-        }
+        }*/
         startFlg = 1;
       }
       
       //Pushing the servo forwards
       Serial.println(servonum);
-      for (uint16_t pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen+=5) {
-        pwm.setPWM(servonum, 0, pulselen);
+      if(servonum%2){
+        for (uint16_t pulselen = SERVOODDMIN; pulselen < SERVOODDMAX; pulselen+=5) {
+          pwm.setPWM(servonum, 0, pulselen);
+        }
+      }else{
+        for (uint16_t pulselen = SERVOEVENMAX; pulselen > SERVOEVENMIN; pulselen-=5) {
+          pwm.setPWM(servonum, 0, pulselen);
+        }
       }
+
       
       //Pulling the servo Back
       delay(250);
-      
-      for (uint16_t pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen-=5) {
-        pwm.setPWM(servonum, 0, pulselen);
+
+      if(servonum%2){
+        for (uint16_t pulselen = SERVOODDMAX; pulselen > SERVOODDMIN; pulselen-=5) {
+          pwm.setPWM(servonum, 0, pulselen);
+        }
+      }else{
+        for (uint16_t pulselen = SERVOEVENMIN; pulselen < SERVOEVENMAX; pulselen+=5){
+          pwm.setPWM(servonum, 0, pulselen);
+        }
       }
 
       delay(250);
