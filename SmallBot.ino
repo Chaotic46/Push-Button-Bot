@@ -57,7 +57,9 @@ void setup() {
 
   while(!SD.begin(10))
     Serial.println("initialization failed!");
-  if(SD.begin(10))
+
+  Serial.println("Init Success");
+  delay(20);
 
   myFile = SD.open("pi.txt");
   
@@ -139,52 +141,51 @@ void loop()
   }
 }
 
-//Three minute timer
-ISR(TIMER1_COMPA_vect){//timer1 interrupt
+//Three minute timer //timer1 interrupt
+ISR(TIMER1_COMPA_vect)
+{
+   timerCount++;
+  if(timerCount == 180)
   {
-    timerCount++;
-    if(timerCount == 180)
-    {
-      Serial.println("3 Minutes");
-      while(1){};
-    }
+    Serial.println("3 Minutes");
+    while(1){};
   }
 }
 
 void SDtoServo(uint8_t SDnum)
 {
-        switch(SDnum)
-      {
-        case 48: servonum = 9; break;
-        case 49: servonum = 8; break;
-        case 50: servonum = 7; break;
-        case 51: servonum = 6; break;
-        case 52: servonum = 5; break;
-        case 53: servonum = 4; break;
-        case 54: servonum = 3; break;
-        case 55: servonum = 2; break;
-        case 56: servonum = 1; break;
-        case 57: servonum = 0; break;
-      }
+  switch(SDnum)
+  {
+    case 48: servonum = 9; break;
+    case 49: servonum = 8; break;
+    case 50: servonum = 7; break;
+    case 51: servonum = 6; break;
+    case 52: servonum = 5; break;
+    case 53: servonum = 4; break;
+    case 54: servonum = 3; break;
+    case 55: servonum = 2; break;
+    case 56: servonum = 1; break;
+    case 57: servonum = 0; break;
+   }
 }
 
 void runEven()
 {
-           for (uint16_t pulselen = SERVOODDMIN; pulselen < SERVOODDMAX; pulselen+=5) 
-        pwm.setPWM(servonum, 0, pulselen);
-        delay(250);
-        for (uint16_t pulselen = SERVOODDMAX; pulselen > SERVOODDMIN; pulselen-=5) 
-        pwm.setPWM(servonum, 0, pulselen);
-        delay(250);
+  for (uint16_t pulselen = SERVOODDMIN; pulselen < SERVOODDMAX; pulselen+=5) 
+  pwm.setPWM(servonum, 0, pulselen);
+  delay(250);
+  for (uint16_t pulselen = SERVOODDMAX; pulselen > SERVOODDMIN; pulselen-=5) 
+  pwm.setPWM(servonum, 0, pulselen);
+  delay(250);
 }
 
 void runOdd()
 {
-            for (uint16_t pulselen = SERVOEVENMAX; pulselen > SERVOEVENMIN; pulselen-=5) 
-          pwm.setPWM(servonum, 0, pulselen);
-          delay(250); 
-            for (uint16_t pulselen = SERVOEVENMIN; pulselen < SERVOEVENMAX; pulselen+=5)
-          pwm.setPWM(servonum, 0, pulselen);
-          delay(250);
+  for (uint16_t pulselen = SERVOEVENMAX; pulselen > SERVOEVENMIN; pulselen-=5) 
+  pwm.setPWM(servonum, 0, pulselen);
+  delay(250); 
+  for (uint16_t pulselen = SERVOEVENMIN; pulselen < SERVOEVENMAX; pulselen+=5)
+  pwm.setPWM(servonum, 0, pulselen);
+  delay(250);
 
 }
